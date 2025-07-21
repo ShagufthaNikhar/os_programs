@@ -1,0 +1,136 @@
+To Design, develop and implement a C/C++/Java program to implement Banker’s algorithm. Assume suitable input required to demonstrate the results. 
+
+#include <stdio.h> 
+ 
+void displayMatrix(int matrix[][10], int rows, int cols) { 
+    for (int i = 0; i < rows; i++) { 
+        for (int j = 0; j < cols; j++) { 
+            printf("%d ", matrix[i][j]); 
+        } 
+        printf("\n"); 
+    } 
+} 
+ 
+int main() 
+ { 
+    int Max[10][10], alloc[10][10], need[10][10], avail[10], completed[10], safeSequence[10]; 
+    int p, r, i, j, process, count = 0; 
+ 
+    // Get the number of processes with validation 
+    do 
+ { 
+        printf("Enter the number of processes (max 10): "); 
+        scanf("%d", &p); 
+    } while (p <= 0 || p > 10); 
+ 
+    // Get the number of resources with validation 
+    do 
+ { 
+        printf("Enter the number of resources (max 10): "); 
+        scanf("%d", &r); 
+    } while (r <= 0 || r > 10); 
+ 
+    // Initialize completed array 
+    for (i = 0; i < p; i++) 
+        completed[i] = 0; 
+ 
+    // Input Max matrix with validation 
+    printf("Enter the Max Matrix for each process:\n"); 
+    for (i = 0; i < p; i++) 
+ { 
+        printf("For process %d: ", i + 1); 
+        for (j = 0; j < r; j++) 
+            scanf("%d", &Max[i][j]); 
+    } 
+ 
+ 
+ 
+ 
+    // Input allocation matrix with validation 
+    printf("Enter the allocation for each process:\n"); 
+    for (i = 0; i < p; i++)  
+{ 
+        printf("For process %d: ", i + 1); 
+        for (j = 0; j < r; j++) 
+            scanf("%d", &alloc[i][j]); 
+    } 
+ 
+    // Input available resources with validation 
+    printf("Enter the Available Resources:\n"); 
+    for (i = 0; i < r; i++) 
+        scanf("%d", &avail[i]); 
+ 
+    // Calculate need matrix 
+    for (i = 0; i < p; i++) 
+        for (j = 0; j < r; j++) 
+            need[i][j] = Max[i][j] - alloc[i][j]; 
+ 
+    // Display Max, Allocation, and Need matrices 
+    printf("\nMax Matrix:\n"); 
+    displayMatrix(Max, p, r); 
+ 
+    printf("\nAllocation Matrix:\n"); 
+    displayMatrix(alloc, p, r); 
+ 
+    printf("\nNeed Matrix:\n"); 
+    displayMatrix(need, p, r); 
+ 
+    // Banker's algorithm 
+    Do 
+ { 
+        process = -1; 
+ 
+        for (i = 0; i < p; i++) 
+ { 
+            if (completed[i] == 0)  
+{ 
+                process = i; 
+ 
+                for (j = 0; j < r; j++) 
+ { 
+                    if (avail[j] < need[i][j])  
+{ 
+                        process = -1; 
+                        break; 
+                    } 
+                } 
+            } 
+ 
+            if (process != -1) 
+                break; 
+        } 
+ 
+        if (process != -1)  
+{ 
+            printf("\nProcess %d runs to completion!", process + 1); 
+ 
+            // Release resources held by the completed process 
+            for (j = 0; j < r; j++) 
+ { 
+                avail[j] += alloc[process][j]; 
+                alloc[process][j] = 0; 
+                Max[process][j] = 0; 
+            } 
+ 
+            // Mark the process as completed outside the loop 
+            completed[process] = 1; 
+ 
+            // Update safe sequence and increment count 
+            safeSequence[count] = process + 1; 
+            count++; 
+        } 
+    } while (count != p && process != -1); 
+ 
+    // Display results based on the outcome of the Banker's algorithm 
+    if (count == p)  
+{ 
+        printf("\nThe system is in a safe state!!\n"); 
+        printf("Safe Sequence : < "); 
+        for (i = 0; i < p; i++) 
+            printf("%d ", safeSequence[i]); 
+            printf(">\n"); 
+    }  
+else 
+        printf("\nThe system is in an unsafe state!!\n"); 
+        return 0; 
+} 
